@@ -1,13 +1,18 @@
-import Link from "next/link";
-import { Post } from "../queries/posts";
-import { useRouter } from "next/router";
+import { useQuery } from '@tanstack/react-query';
+import { postsQueryOptions } from '../queries/posts';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
-export const PostList = ({ data }: { data: Post[] | undefined; }) => {
+export const PostListQuery = () => {
   const { query } = useRouter();
 
   const _postCount = Array.isArray(query.count) ? query.count?.[0] || '10' : query.count || '10';
   const postCount = parseInt(_postCount);
-  
+
+  const { data, isPending, isFetching } = useQuery(postsQueryOptions(postCount));
+
+  if (isPending) return <div>Loading</div>;
+
   return (
     <section>
       <ul>
@@ -19,7 +24,13 @@ export const PostList = ({ data }: { data: Post[] | undefined; }) => {
       </ul>
 
       {postCount <= 90 && (
-        <Link type="button" href={`/non-query-ssr?count=${postCount + 10}`}>
+        <Link 
+          type="button" 
+          href={`/non-query-ssr?count=${postCount + 10}`} 
+          onClick={(e) => {
+            if(isFetching) e.preventDefault();
+          }}
+        >
           {'Show More'}
         </Link>
       )}

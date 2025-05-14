@@ -8,23 +8,32 @@ export const Header = () => {
   return (
     <header>
       <Link href="/" className={pathname === '/' ? 'is-active' : ''}>
-        Home
+        SSR Query
       </Link>
 
       <Link
         href="/client-only"
         className={pathname === '/client-only' ? 'is-active' : ''}
       >
-        Client-Only
+        Client-Only Query
       </Link>
+
+      <Link
+        href="/non-query-ssr"
+        className={pathname === '/client-only' ? 'is-active' : ''}
+      >
+        SSR Non Query
+      </Link>
+
 
       <style jsx>{`
         header {
+          display: flex;
+          gap: 16px;
           margin-bottom: 25px;
         }
         a {
           font-size: 14px;
-          margin-right: 15px;
           text-decoration: none;
         }
         .is-active {

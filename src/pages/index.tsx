@@ -1,33 +1,33 @@
 import React from 'react'
 import { QueryClient, dehydrate } from '@tanstack/react-query'
-import { Header, InfoBox, Layout, PostList } from '../components'
-import { fetchPosts } from '../hooks/usePosts'
+import { Header, InfoBox, Layout, PostListQuery } from '../components'
+import { postsQueryOptions } from '../queries/posts'
+import { GetServerSidePropsContext } from 'next'
 
-const Home = () => {
-  return (
-    <Layout>
-      <Header />
-      <InfoBox>ℹ️ This page shows how to use SSG with React-Query.</InfoBox>
-      <PostList />
-    </Layout>
-  )
-}
+export async function getServerSideProps(ctx: GetServerSidePropsContext) {
+  const { query } = ctx;
+  const queryClient = new QueryClient();
 
-export async function getStaticProps() {
-  const queryClient = new QueryClient()
-
-  const [result] = await queryClient.fetchQuery({
-    queryKey: ['posts', 10],
-    queryFn: () => fetchPosts(10),
-  });
-
-  console.log(result.body);
+  const _postCount = Array.isArray(query.count) ? query.count?.[0] || '10' : query.count || '10';
+  const postCount = parseInt(_postCount);
+  
+  await queryClient.fetchQuery(postsQueryOptions(postCount));
 
   return {
     props: {
       dehydratedState: dehydrate(queryClient),
     },
   }
+}
+
+const Home = () => {
+  return (
+    <Layout>
+      <Header />
+      <InfoBox>ℹ️ This page shows how to use SSR with React-Query.</InfoBox>
+      <PostListQuery />
+    </Layout>
+  )
 }
 
 export default Home
